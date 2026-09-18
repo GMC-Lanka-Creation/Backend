@@ -2,6 +2,8 @@ package com.gmc.backend.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -39,6 +41,14 @@ public class CustomDesign {
     @NotBlank(message = "Description is required")
     @Column(length = 2000, nullable = false)
     private String description;
+
+    @Column(name = "file_path")
+    private String filePath;
+
+    @NotNull(message = "Status is required")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CustomDesignStatus status;
 
     @NotNull(message = "Created date is required")
     @Column(name = "created_date", nullable = false)
