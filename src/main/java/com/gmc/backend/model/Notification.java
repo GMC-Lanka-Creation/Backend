@@ -2,8 +2,6 @@ package com.gmc.backend.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,41 +20,38 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "custom_designs")
+@Table(name = "notifications")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CustomDesign {
+public class Notification {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "design_id")
-    private Long designId;
+    @Column(name = "notification_id")
+    private Long notificationId;
 
-    @NotBlank(message = "Design name is required")
-    @Column(name = "design_name", nullable = false)
-    private String designName;
+    @NotBlank(message = "Message is required")
+    @Column(nullable = false, length = 500)
+    private String message;
 
-    @NotBlank(message = "Description is required")
-    @Column(length = 2000, nullable = false)
-    private String description;
-
-    @Column(name = "file_path")
-    private String filePath;
-
-    @NotNull(message = "Status is required")
-    @Enumerated(EnumType.STRING)
+    @NotBlank(message = "Type is required")
     @Column(nullable = false)
-    private CustomDesignStatus status;
+    private String type;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean read = false;
 
     @NotNull(message = "Created date is required")
-    @Column(name = "created_date", nullable = false)
-    private LocalDateTime createdDate;
+    @Builder.Default
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @NotNull(message = "User is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
 }
