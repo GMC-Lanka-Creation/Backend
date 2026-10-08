@@ -3,7 +3,6 @@ package com.gmc.backend.security;
 import com.gmc.backend.model.Role;
 import com.gmc.backend.model.User;
 import com.gmc.backend.repository.UserRepository;
-import com.gmc.backend.security.CustomUserDetailsService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
