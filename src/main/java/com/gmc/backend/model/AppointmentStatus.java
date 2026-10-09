@@ -2,7 +2,8 @@ package com.gmc.backend.model;
 
 public enum AppointmentStatus {
     PENDING,
-    CONFIRMED,
+    APPROVED,
+    RESCHEDULED,
     CANCELLED,
     COMPLETED
 }
