@@ -2,6 +2,7 @@ package com.gmc.backend.service.impl;
 
 import com.gmc.backend.dto.request.MaintenanceAssignRequest;
 import com.gmc.backend.dto.response.MaintenanceResponse;
+import com.gmc.backend.exception.BusinessRuleException;
 import com.gmc.backend.exception.ResourceNotFoundException;
 import com.gmc.backend.model.Maintenance;
 import com.gmc.backend.model.Product;
@@ -60,10 +61,13 @@ public class MaintenanceServiceImpl implements MaintenanceService {
 
     @Override
     @Transactional
-    public MaintenanceResponse updateMaintenanceStatus(Long maintenanceId, String status) {
+    public MaintenanceResponse updateMaintenanceStatus(Long maintenanceId, Long technicianId, String status) {
         Maintenance maintenance = maintenanceRepository.findById(maintenanceId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Maintenance task not found: " + maintenanceId));
+        if (!maintenance.getUser().getUserId().equals(technicianId)) {
+            throw new BusinessRuleException("Access denied to maintenance task: " + maintenanceId);
+        }
         maintenance.setStatus(status);
         return toResponse(maintenanceRepository.save(maintenance));
     }

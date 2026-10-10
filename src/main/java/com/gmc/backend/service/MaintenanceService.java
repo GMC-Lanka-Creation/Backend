@@ -13,6 +13,5 @@ public interface MaintenanceService {
 
     List<MaintenanceResponse> getAllMaintenance();
 
-    MaintenanceResponse updateMaintenanceStatus(Long maintenanceId, String status);
+    MaintenanceResponse updateMaintenanceStatus(Long maintenanceId, Long technicianId, String status);
 }
-
