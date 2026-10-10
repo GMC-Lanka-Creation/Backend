@@ -21,6 +21,12 @@ public interface AppointmentService {
 
     List<AppointmentResponse> getAppointmentsByStatus(AppointmentStatus status);
 
+    AppointmentResponse approveAppointment(Long appointmentId);
+
+    AppointmentResponse adminReschedule(Long appointmentId, RescheduleRequest request);
+
+    AppointmentResponse adminCancel(Long appointmentId);
+
+    // Generic admin status change (APPROVED, CANCELLED, COMPLETED); rules are enforced inside
     AppointmentResponse updateStatus(Long appointmentId, AppointmentStatus status);
 }
-
