@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
@@ -18,7 +19,19 @@ public class JwtTokenProvider {
     private final long ACCESS_TOKEN_VALIDITY = 15 * 60 * 1000;
 
     // Secret key (use a strong random string, ideally from application.properties)
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private final Key key;
+
+    public JwtTokenProvider() {
+        this(Keys.secretKeyFor(SignatureAlgorithm.HS256));
+    }
+
+    JwtTokenProvider(String secret) {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private JwtTokenProvider(Key key) {
+        this.key = key;
+    }
 
     //  Generate Access Token with extra claims
     public String generateToken(org.springframework.security.core.userdetails.UserDetails userDetails,

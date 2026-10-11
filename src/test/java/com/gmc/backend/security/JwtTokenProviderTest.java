@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,11 +22,8 @@ class JwtTokenProviderTest {
     private static final String SECRET = "dGVzdFNlY3JldEtleUZvclVuaXRUZXN0aW5nUHVycG9zZXNPbmx5";
 
     @BeforeEach
-    void setUp() throws Exception {
-        jwtTokenProvider = new JwtTokenProvider();
-        Field secretField = JwtTokenProvider.class.getDeclaredField("secretKey");
-        secretField.setAccessible(true);
-        secretField.set(jwtTokenProvider, SECRET);
+    void setUp() {
+        jwtTokenProvider = new JwtTokenProvider(SECRET);
     }
 
     @Test
