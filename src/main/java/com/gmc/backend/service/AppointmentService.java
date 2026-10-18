@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface AppointmentService {
 
+    // ── Customer side (only the owner can act) ───────────────────────────────
     AppointmentResponse bookAppointment(Long userId, AppointmentRequest request);
 
     AppointmentResponse reschedule(Long appointmentId, Long userId, RescheduleRequest request);
@@ -17,16 +18,18 @@ public interface AppointmentService {
 
     List<AppointmentResponse> getAppointmentsByUser(Long userId);
 
+    // ── Admin side (any appointment) ─────────────────────────────────────────
     List<AppointmentResponse> getAllAppointments();
 
     List<AppointmentResponse> getAppointmentsByStatus(AppointmentStatus status);
 
-    AppointmentResponse approveAppointment(Long appointmentId);
+    AppointmentResponse approveAppointment(Long appointmentId, String meetingLink, String note);
 
     AppointmentResponse adminReschedule(Long appointmentId, RescheduleRequest request);
 
-    AppointmentResponse adminCancel(Long appointmentId);
+    AppointmentResponse adminCancel(Long appointmentId, String note);
 
     // Generic admin status change (APPROVED, CANCELLED, COMPLETED); rules are enforced inside
-    AppointmentResponse updateStatus(Long appointmentId, AppointmentStatus status);
+    AppointmentResponse updateStatus(Long appointmentId, AppointmentStatus status,
+                                     String meetingLink, String note);
 }
