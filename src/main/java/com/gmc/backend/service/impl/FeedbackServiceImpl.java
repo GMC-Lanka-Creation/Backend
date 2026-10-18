@@ -115,7 +115,8 @@ public class FeedbackServiceImpl implements FeedbackService {
             return;
         }
         notificationService.notifyAdmins(f.getUser().getName() + " " + verb + " " + f.getProduct().getName()
-                        + " " + f.getRating() + "★ (order #" + f.getOrder().getOrderId() + "): \"" + f.getComment() + "\"",
+                        + " " + f.getRating() + "★ (order #" + f.getOrder().getOrderId()
+                        + "): \"" + f.getComment() + "\"",
                 "REVIEW", "/admin/feedback", null);
     }
 

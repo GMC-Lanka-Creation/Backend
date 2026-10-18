@@ -426,7 +426,8 @@ public class OrderServiceImpl implements OrderService {
                 } else {
                     message += " We'll refund your card payment shortly.";
                     notificationService.notifyAdmins("Automatic refund FAILED for cancelled order #" + orderId
-                                    + " (" + formatMoney(order.getTotalAmount()) + "). Refund it in the Stripe Dashboard.",
+                                    + " (" + formatMoney(order.getTotalAmount())
+                                    + "). Refund it in the Stripe Dashboard.",
                             "PAYMENT", ADMIN_ORDERS_LINK, "Refund needed for order #" + orderId);
                 }
             }
