@@ -1,10 +1,14 @@
 package com.gmc.backend.controller;
 
+import com.gmc.backend.exception.BusinessRuleException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.gmc.backend.security.CustomUserDetails;
 import com.gmc.backend.dto.request.AppointmentStatusRequest;
 import com.gmc.backend.dto.request.CategoryRequest;
 import com.gmc.backend.dto.request.CreateUserRequest;
 import com.gmc.backend.dto.request.MaintenanceAssignRequest;
 import com.gmc.backend.dto.request.OrderStatusUpdateRequest;
+import com.gmc.backend.dto.request.RescheduleRequest;
 import com.gmc.backend.dto.response.AppointmentResponse;
 import com.gmc.backend.dto.response.CategoryResponse;
 import com.gmc.backend.dto.response.ComplaintResponse;
@@ -23,6 +27,7 @@ import com.gmc.backend.service.AppointmentService;
 import com.gmc.backend.service.CategoryService;
 import com.gmc.backend.service.ComplaintService;
 import com.gmc.backend.service.CustomDesignService;
+import com.gmc.backend.service.FileStorageService;
 import com.gmc.backend.service.FeedbackService;
 import com.gmc.backend.service.InvoiceService;
 import com.gmc.backend.service.MaintenanceService;
@@ -32,6 +37,7 @@ import com.gmc.backend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +48,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -64,6 +72,7 @@ public class AdminController {
     private final InvoiceService invoiceService;
     private final CategoryService categoryService;
     private final ProductService productService;
+    private final FileStorageService fileStorageService;
 
     // ── Dashboard ─────────────────────────────────────────────────────────────
 
@@ -114,7 +123,12 @@ public class AdminController {
     }
 
     @PatchMapping("/users/{userId}/deactivate")
-    public ResponseEntity<UserResponse> deactivateUser(@PathVariable Long userId) {
+    public ResponseEntity<UserResponse> deactivateUser(
+            @AuthenticationPrincipal CustomUserDetails admin,
+            @PathVariable Long userId) {
+        if (admin.getId().equals(userId)) {
+            throw new BusinessRuleException("You can't deactivate your own account");
+        }
         return ResponseEntity.ok(userService.deactivateUser(userId));
     }
 
@@ -157,7 +171,15 @@ public class AdminController {
             @PathVariable Long appointmentId,
             @Valid @RequestBody AppointmentStatusRequest request) {
         return ResponseEntity.ok(
-                appointmentService.updateStatus(appointmentId, request.getStatus()));
+                appointmentService.updateStatus(appointmentId, request.getStatus(),
+                        request.getMeetingLink(), request.getNote()));
+    }
+
+    @PutMapping("/appointments/{appointmentId}/reschedule")
+    public ResponseEntity<AppointmentResponse> rescheduleAppointment(
+            @PathVariable Long appointmentId,
+            @Valid @RequestBody RescheduleRequest request) {
+        return ResponseEntity.ok(appointmentService.adminReschedule(appointmentId, request));
     }
 
     // ── Feedback & Complaints ─────────────────────────────────────────────────
@@ -165,6 +187,14 @@ public class AdminController {
     @GetMapping("/feedback")
     public ResponseEntity<List<FeedbackResponse>> getAllFeedback() {
         return ResponseEntity.ok(feedbackService.getAllFeedback());
+    }
+
+    // Moderation: hide abusive/spam reviews from the product page (and show them again)
+    @PatchMapping("/feedback/{feedbackId}/visibility")
+    public ResponseEntity<FeedbackResponse> setFeedbackVisibility(
+            @PathVariable Long feedbackId,
+            @RequestParam boolean hidden) {
+        return ResponseEntity.ok(feedbackService.setHidden(feedbackId, hidden));
     }
 
     @GetMapping("/complaints")
@@ -218,6 +248,20 @@ public class AdminController {
             @Valid @RequestBody MaintenanceAssignRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(maintenanceService.assignMaintenance(request));
+    }
+
+    @PostMapping(value = "/maintenance/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<List<String>> uploadMaintenanceImages(
+            @RequestPart("files") List<MultipartFile> files) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(fileStorageService.storeImages(files, "maintenance"));
+    }
+
+    // ── Products (admin list includes archived ones) ─────────────────────────
+
+    @GetMapping("/products")
+    public ResponseEntity<List<ProductResponse>> getAllProductsForAdmin() {
+        return ResponseEntity.ok(productService.getAllProductsIncludingArchived());
     }
 
     // ── Categories ────────────────────────────────────────────────────────────

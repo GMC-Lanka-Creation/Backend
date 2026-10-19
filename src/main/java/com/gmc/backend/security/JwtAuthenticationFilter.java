@@ -29,7 +29,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         return path.startsWith("/api/auth/")
                 || (method.equals("GET") && path.startsWith("/api/products"))
-                || path.startsWith("/api-docs")
                 || path.startsWith("/v3/api-docs")
                 || path.startsWith("/swagger-ui");
     }
@@ -58,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UserDetails userDetails =
                         userDetailsService.loadUserByUsername(username);
 
-                if (jwtTokenProvider.validateToken(token, userDetails)) {
+                if (userDetails.isEnabled() && jwtTokenProvider.validateToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
                                     userDetails,
