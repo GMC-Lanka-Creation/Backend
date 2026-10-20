@@ -8,4 +8,3 @@ import com.gmc.backend.model.User;
  */
 public record RefreshTokenResult(String rawToken, User user) {
 }
-

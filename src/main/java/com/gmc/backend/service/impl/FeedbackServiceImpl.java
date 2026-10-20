@@ -115,8 +115,7 @@ public class FeedbackServiceImpl implements FeedbackService {
             return;
         }
         notificationService.notifyAdmins(f.getUser().getName() + " " + verb + " " + f.getProduct().getName()
-                        + " " + f.getRating() + "★ (order #" + f.getOrder().getOrderId()
-                        + "): \"" + f.getComment() + "\"",
+                + " " + f.getRating() + "★ (order #" + f.getOrder().getOrderId() + "): \"" + f.getComment() + "\"",
                 "REVIEW", "/admin/feedback", null);
     }
 
@@ -149,7 +148,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         List<Feedback> reviews = feedbackRepository.findVisibleByProduct(productId);
         BigDecimal average = reviews.isEmpty() ? BigDecimal.ZERO
                 : BigDecimal.valueOf(reviews.stream().mapToInt(Feedback::getRating).sum())
-                .divide(BigDecimal.valueOf(reviews.size()), 1, RoundingMode.HALF_UP);
+                        .divide(BigDecimal.valueOf(reviews.size()), 1, RoundingMode.HALF_UP);
         return ProductReviewsResponse.builder()
                 .averageRating(average)
                 .reviewCount(reviews.size())

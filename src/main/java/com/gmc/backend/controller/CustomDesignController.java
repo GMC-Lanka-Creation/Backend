@@ -40,4 +40,3 @@ public class CustomDesignController {
         return ResponseEntity.ok(customDesignService.getDesignsByUser(user.getId()));
     }
 }
-

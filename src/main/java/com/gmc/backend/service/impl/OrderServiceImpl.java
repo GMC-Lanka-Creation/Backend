@@ -160,7 +160,7 @@ public class OrderServiceImpl implements OrderService {
                 throw new BusinessRuleException(available == 0
                         ? product.getName() + " is out of stock. Please remove it from your cart."
                         : "Only " + available + " of " + product.getName() + " left in stock. "
-                        + "Please reduce the quantity in your cart.");
+                                + "Please reduce the quantity in your cart.");
             }
             product.setStockQuantity(available - ci.getQuantity());
             return OrderItem.builder()
@@ -192,7 +192,7 @@ public class OrderServiceImpl implements OrderService {
                     + " ready to pay on delivery.", "ORDER", customerLink(saved));
             sendOrderConfirmationEmail(saved);
             notificationService.notifyAdmins("New order #" + saved.getOrderId() + " from " + user.getName()
-                            + " — " + formatMoney(saved.getTotalAmount()) + ", cash on delivery.",
+                    + " — " + formatMoney(saved.getTotalAmount()) + ", cash on delivery.",
                     "ORDER", ADMIN_ORDERS_LINK, null);
         }
         return PlaceOrderResponse.builder().order(toResponse(saved)).build();
@@ -351,7 +351,7 @@ public class OrderServiceImpl implements OrderService {
                     true);
         }
         notificationService.notifyAdmins("Card payment for order #" + order.getOrderId() + " needs attention: "
-                        + reason + ". " + (refunded ? "It was refunded automatically."
+                + reason + ". " + (refunded ? "It was refunded automatically."
                         : "Automatic refund FAILED — refund it in the Stripe Dashboard."),
                 "PAYMENT", ADMIN_ORDERS_LINK, refunded ? null : "Refund needed for order #" + order.getOrderId());
     }
@@ -426,8 +426,7 @@ public class OrderServiceImpl implements OrderService {
                 } else {
                     message += " We'll refund your card payment shortly.";
                     notificationService.notifyAdmins("Automatic refund FAILED for cancelled order #" + orderId
-                                    + " (" + formatMoney(order.getTotalAmount())
-                                    + "). Refund it in the Stripe Dashboard.",
+                            + " (" + formatMoney(order.getTotalAmount()) + "). Refund it in the Stripe Dashboard.",
                             "PAYMENT", ADMIN_ORDERS_LINK, "Refund needed for order #" + orderId);
                 }
             }

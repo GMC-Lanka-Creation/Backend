@@ -149,11 +149,11 @@ public class ProductServiceImpl implements ProductService {
         List<String> images = request.getImageUrls() == null
                 ? new ArrayList<>()
                 : request.getImageUrls().stream()
-                .filter(Objects::nonNull)
-                .map(String::trim)
-                .filter(url -> !url.isEmpty())
-                .distinct()
-                .collect(Collectors.toCollection(ArrayList::new));
+                        .filter(Objects::nonNull)
+                        .map(String::trim)
+                        .filter(url -> !url.isEmpty())
+                        .distinct()
+                        .collect(Collectors.toCollection(ArrayList::new));
         String cover = request.getImageUrl();
         if (images.isEmpty() && cover != null && !cover.isBlank()) {
             images.add(cover.trim());
