@@ -63,10 +63,10 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         List<String> images = request.getImageUrls() == null
                 ? new ArrayList<>()
                 : request.getImageUrls().stream()
-                .filter(Objects::nonNull)
-                .filter(url -> !url.isBlank())
-                .distinct()
-                .collect(Collectors.toCollection(ArrayList::new));
+                        .filter(Objects::nonNull)
+                        .filter(url -> !url.isBlank())
+                        .distinct()
+                        .collect(Collectors.toCollection(ArrayList::new));
         Maintenance maintenance = Maintenance.builder()
                 .description(request.getDescription())
                 .status("ASSIGNED")
@@ -119,7 +119,7 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         Maintenance saved = maintenanceRepository.save(maintenance);
         if ("COMPLETED".equals(newStatus)) {
             notificationService.notifyAdmins(saved.getUser().getName() + " completed maintenance task #"
-                            + saved.getMaintenanceId() + " (" + subjectOf(saved) + ").",
+                    + saved.getMaintenanceId() + " (" + subjectOf(saved) + ").",
                     "MAINTENANCE", "/admin/maintenance", null);
         }
         return toResponse(saved);
@@ -137,9 +137,9 @@ public class MaintenanceServiceImpl implements MaintenanceService {
                         + "Task: " + subjectOf(task) + "\n"
                         + "Details: " + task.getDescription() + "\n"
                         + (task.getDeadline() == null ? ""
-                        : "Deadline: " + task.getDeadline().format(DEADLINE_FORMAT) + "\n")
+                                : "Deadline: " + task.getDeadline().format(DEADLINE_FORMAT) + "\n")
                         + (task.getImageUrls().isEmpty() ? ""
-                        : "Reference images: " + task.getImageUrls().size() + " (see the task in the app)\n")
+                                : "Reference images: " + task.getImageUrls().size() + " (see the task in the app)\n")
                         + "\nOpen My Tasks in the GMC Lanka app to get started.\n\n— GMC Lanka");
     }
 

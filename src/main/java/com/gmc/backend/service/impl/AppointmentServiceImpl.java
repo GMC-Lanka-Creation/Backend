@@ -73,9 +73,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         // A customer is waiting for a reply, so admins also get an email
         int images = saved.getImageUrls().size();
         notificationService.notifyAdmins("New appointment request from " + user.getName()
-                        + (category != null ? " about " + category.getName() : "") + " for "
-                        + format(request.getDate()) + (images > 0 ? " (" + images + " image" + (images > 1 ? "s" : "")
-                        + " attached)" : "") + ": \"" + request.getMessage() + "\"",
+                + (category != null ? " about " + category.getName() : "") + " for "
+                + format(request.getDate()) + (images > 0 ? " (" + images + " image" + (images > 1 ? "s" : "")
+                + " attached)" : "") + ": \"" + request.getMessage() + "\"",
                 "APPOINTMENT", ADMIN_APPOINTMENTS_LINK, "New appointment request");
         return toResponse(saved);
     }
@@ -92,7 +92,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         notifyUser(userId, "Reschedule requested for " + format(request.getNewDate())
                 + ". We'll confirm the new time soon.");
         notificationService.notifyAdmins(appointment.getUser().getName() + " asked to reschedule their "
-                        + "appointment to " + format(request.getNewDate()) + ". Please approve the new time.",
+                + "appointment to " + format(request.getNewDate()) + ". Please approve the new time.",
                 "APPOINTMENT", ADMIN_APPOINTMENTS_LINK, null);
         return toResponse(saved);
     }
