@@ -16,4 +16,3 @@ public interface PasswordResetTokenRepository extends JpaRepository<PasswordRese
     @Transactional
     void deleteAllByUser(User user);
 }
-

@@ -14,20 +14,20 @@ import java.util.List;
 
 public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
 
-    Page<Feedback> findByProduct_ProductId(Long productId, Pageable pageable);
+     Page<Feedback> findByProduct_ProductId(Long productId, Pageable pageable);
 
-    List<Feedback> findByUser(User user);
+     List<Feedback> findByUser(User user);
 
-    List<Feedback> findByUser_UserId(Long userId);
+     List<Feedback> findByUser_UserId(Long userId);
 
-    boolean existsByUserAndOrder(User user, Order order);
+     boolean existsByUserAndOrder(User user, Order order);
 
-    boolean existsByUserAndOrderAndProduct(User user, Order order, Product product);
+     boolean existsByUserAndOrderAndProduct(User user, Order order, Product product);
 
-    List<Feedback> findByProduct_ProductIdOrderByCreatedAtDesc(Long productId);
+     List<Feedback> findByProduct_ProductIdOrderByCreatedAtDesc(Long productId);
 
-    // Public reviews: hidden ones are excluded (NULL counts as visible for older rows)
-    @Query("SELECT f FROM Feedback f WHERE f.product.productId = :productId "
-            + "AND (f.hidden IS NULL OR f.hidden = false) ORDER BY f.createdAt DESC")
-    List<Feedback> findVisibleByProduct(@Param("productId") Long productId);
+     // Public reviews: hidden ones are excluded (NULL counts as visible for older rows)
+     @Query("SELECT f FROM Feedback f WHERE f.product.productId = :productId "
+             + "AND (f.hidden IS NULL OR f.hidden = false) ORDER BY f.createdAt DESC")
+     List<Feedback> findVisibleByProduct(@Param("productId") Long productId);
 }

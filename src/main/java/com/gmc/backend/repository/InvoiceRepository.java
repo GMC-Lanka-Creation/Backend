@@ -20,4 +20,3 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     List<Invoice> findByInvoiceDate(LocalDate invoiceDate);
 }
-

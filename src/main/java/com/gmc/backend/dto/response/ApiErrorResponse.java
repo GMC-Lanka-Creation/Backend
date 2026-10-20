@@ -1,4 +1,4 @@
-    package com.gmc.backend.dto.response;
+package com.gmc.backend.dto.response;
 
 import lombok.Builder;
 import lombok.Data;

@@ -19,4 +19,3 @@ public class CustomDesignResponse {
     private Long userId;
     private String userName;
 }
-

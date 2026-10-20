@@ -14,4 +14,3 @@ public interface InvoiceService {
 
     List<InvoiceResponse> getAllInvoices();
 }
-

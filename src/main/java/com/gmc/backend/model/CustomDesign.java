@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class CustomDesign {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "design_id")
@@ -45,10 +46,10 @@ public class CustomDesign {
     @Column(name = "file_path")
     private String filePath;
 
-    @NotNull(message = "Status is required")
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     @Column(nullable = false)
-    private CustomDesignStatus status;
+    private CustomDesignStatus status = CustomDesignStatus.PENDING_REVIEW;
 
     @NotNull(message = "Created date is required")
     @Column(name = "created_date", nullable = false)
@@ -58,5 +59,4 @@ public class CustomDesign {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
 }
