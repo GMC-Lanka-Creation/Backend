@@ -51,18 +51,17 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
-                        .requestMatchers(
-                                "/api-docs", "/api-docs/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html", "/swagger-ui/**"
-                        ).permitAll()
+                        .requestMatchers("/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/orders/**").hasRole("CUSTOMER")
                         .requestMatchers("/api/appointments/**").hasRole("CUSTOMER")
                         .requestMatchers("/api/feedback/**").hasRole("CUSTOMER")
                         .requestMatchers("/api/custom-designs/**").hasRole("CUSTOMER")
+                        // Stripe calls this without a login; the request signature is verified instead
+                        .requestMatchers(HttpMethod.POST, "/api/payments/stripe/webhook").permitAll()
                         .requestMatchers("/api/payments/**").hasRole("CUSTOMER")
                         .requestMatchers("/api/technician/**").hasRole("TECHNICIAN")
+                        .requestMatchers("/api/cart/**", "/api/complaints/**").hasRole("CUSTOMER")
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
@@ -89,7 +88,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(allowedOrigin));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
