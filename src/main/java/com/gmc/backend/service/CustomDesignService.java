@@ -19,4 +19,3 @@ public interface CustomDesignService {
 
     CustomDesignResponse updateStatus(Long designId, CustomDesignStatus status);
 }
-

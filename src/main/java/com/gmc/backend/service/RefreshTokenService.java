@@ -27,4 +27,3 @@ public interface RefreshTokenService {
      */
     void invalidateByRawToken(String rawToken);
 }
-

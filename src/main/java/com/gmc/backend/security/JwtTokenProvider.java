@@ -1,5 +1,8 @@
 package com.gmc.backend.security;
 
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -8,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
@@ -18,19 +22,46 @@ public class JwtTokenProvider {
     // Access token validity: 15 minutes
     private final long ACCESS_TOKEN_VALIDITY = 15 * 60 * 1000;
 
-    // Secret key (use a strong random string, ideally from application.properties)
-    private final Key key;
+    // Secret key used for JWT signing and verification (Base64). Comes from jwt.secret so tokens
+    // survive restarts and work across instances; a random key is used only when none is set.
+    private final String secretKey;
 
     public JwtTokenProvider() {
-        this(Keys.secretKeyFor(SignatureAlgorithm.HS256));
+        this(null);
     }
 
-    JwtTokenProvider(String secret) {
-        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    @Autowired
+    public JwtTokenProvider(@Value("${jwt.secret:}") String configuredSecret) {
+        byte[] decoded = decodeOrEmpty(configuredSecret);
+        if (decoded.length >= 32) {
+            this.secretKey = configuredSecret.trim();
+        } else {
+            if (configuredSecret != null && !configuredSecret.isBlank()) {
+                LoggerFactory.getLogger(JwtTokenProvider.class).warn(
+                        "jwt.secret is shorter than 256 bits; using a random key (tokens reset on restart)");
+            }
+            this.secretKey = Base64.getEncoder()
+                    .encodeToString(Keys.secretKeyFor(SignatureAlgorithm.HS256).getEncoded());
+        }
     }
 
-    private JwtTokenProvider(Key key) {
-        this.key = key;
+    private static byte[] decodeOrEmpty(String value) {
+        if (value == null || value.isBlank()) {
+            return new byte[0];
+        }
+        try {
+            return Base64.getDecoder().decode(value.trim());
+        } catch (IllegalArgumentException e) {
+            return new byte[0];
+        }
+    }
+
+    private Key getSigningKey() {
+        try {
+            return Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretKey));
+        } catch (IllegalArgumentException ex) {
+            return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+        }
     }
 
     //  Generate Access Token with extra claims
@@ -41,7 +72,7 @@ public class JwtTokenProvider {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -75,7 +106,7 @@ public class JwtTokenProvider {
     //  Parse claims
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(key)
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
