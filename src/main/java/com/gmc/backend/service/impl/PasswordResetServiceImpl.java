@@ -1,6 +1,5 @@
 package com.gmc.backend.service.impl;
 
-import java.util.Locale;
 import com.gmc.backend.exception.BusinessRuleException;
 import com.gmc.backend.model.PasswordResetToken;
 import com.gmc.backend.model.User;
@@ -22,14 +21,14 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.HexFormat;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
 public class PasswordResetServiceImpl implements PasswordResetService {
 
     private static final SecureRandom RANDOM = new SecureRandom();
-    private static final String INVALID_LINK =
-            "This reset link is invalid or has expired. Please request a new one.";
+    private static final String INVALID_LINK = "This reset link is invalid or has expired. Please request a new one.";
 
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository resetTokenRepository;
@@ -47,7 +46,9 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     @Transactional
     public void requestReset(String email) {
         // Same outcome for unknown/inactive addresses so the endpoint can't reveal who has an account
-        User user = userRepository.findByEmail(email.trim().toLowerCase(Locale.ROOT)).orElse(null);
+        User user = userRepository
+                .findByEmail(email.trim().toLowerCase(Locale.ROOT))
+                .orElse(null);
         if (user == null || Boolean.FALSE.equals(user.getActive())) {
             return;
         }
@@ -64,7 +65,9 @@ public class PasswordResetServiceImpl implements PasswordResetService {
                 .build());
 
         String link = frontendUrl.replaceAll("/+$", "") + "/reset-password?token=" + rawToken;
-        emailService.send(user.getEmail(), "Reset your GMC Lanka password",
+        emailService.send(
+                user.getEmail(),
+                "Reset your GMC Lanka password",
                 "Hi " + user.getName() + ",\n\n"
                         + "We received a request to reset your GMC Lanka password. "
                         + "Open the link below to choose a new one:\n\n"
@@ -78,7 +81,8 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     @Override
     @Transactional
     public void resetPassword(String rawToken, String newPassword) {
-        PasswordResetToken token = resetTokenRepository.findByToken(hash(rawToken))
+        PasswordResetToken token = resetTokenRepository
+                .findByToken(hash(rawToken))
                 .orElseThrow(() -> new BusinessRuleException(INVALID_LINK));
         if (token.isUsed() || token.getExpiryDate().isBefore(LocalDateTime.now())) {
             throw new BusinessRuleException(INVALID_LINK);

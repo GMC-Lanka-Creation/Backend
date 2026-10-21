@@ -33,7 +33,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     @Transactional
     public String createRefreshToken(Long userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository
+                .findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
         refreshTokenRepository.deleteAllByUser(user);
@@ -56,9 +57,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public RefreshTokenResult rotateRefreshToken(String rawToken) {
         String hashed = hashToken(rawToken);
 
-        RefreshToken existing = refreshTokenRepository.findByToken(hashed)
-                .orElseThrow(() -> new InvalidTokenException(
-                        "REFRESH_TOKEN_INVALID", "Refresh token not found"));
+        RefreshToken existing = refreshTokenRepository
+                .findByToken(hashed)
+                .orElseThrow(() -> new InvalidTokenException("REFRESH_TOKEN_INVALID", "Refresh token not found"));
 
         if (existing.isUsed()) {
             refreshTokenRepository.deleteAllByUser(existing.getUser());
@@ -67,14 +68,12 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
         if (existing.getExpiryDate().isBefore(LocalDateTime.now())) {
             refreshTokenRepository.delete(existing);
-            throw new InvalidTokenException(
-                    "REFRESH_TOKEN_EXPIRED", "Refresh token has expired");
+            throw new InvalidTokenException("REFRESH_TOKEN_EXPIRED", "Refresh token has expired");
         }
 
         if (Boolean.FALSE.equals(existing.getUser().getActive())) {
             refreshTokenRepository.deleteAllByUser(existing.getUser());
-            throw new InvalidTokenException(
-                    "ACCOUNT_DEACTIVATED", "Your account has been deactivated");
+            throw new InvalidTokenException("ACCOUNT_DEACTIVATED", "Your account has been deactivated");
         }
 
         existing.setUsed(true);

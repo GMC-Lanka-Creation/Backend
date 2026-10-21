@@ -1,11 +1,11 @@
 package com.gmc.backend.service.impl;
 
-import com.gmc.backend.model.OrderStatus;
 import com.gmc.backend.dto.response.InvoiceResponse;
 import com.gmc.backend.exception.BusinessRuleException;
 import com.gmc.backend.exception.ResourceNotFoundException;
 import com.gmc.backend.model.Invoice;
 import com.gmc.backend.model.Order;
+import com.gmc.backend.model.OrderStatus;
 import com.gmc.backend.model.PaymentStatus;
 import com.gmc.backend.repository.InvoiceRepository;
 import com.gmc.backend.repository.OrderRepository;
@@ -30,7 +30,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     @Transactional
     public InvoiceResponse generateInvoice(Long orderId) {
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository
+                .findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + orderId));
         if (invoiceRepository.findByOrder_OrderId(orderId).isPresent()) {
             throw new BusinessRuleException("Invoice already exists for order: " + orderId);
@@ -53,23 +54,21 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public InvoiceResponse getInvoiceById(Long invoiceId) {
-        return toResponse(invoiceRepository.findById(invoiceId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Invoice not found: " + invoiceId)));
+        return toResponse(invoiceRepository
+                .findById(invoiceId)
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found: " + invoiceId)));
     }
 
     @Override
     public InvoiceResponse getInvoiceByOrder(Long orderId) {
-        return toResponse(invoiceRepository.findByOrder_OrderId(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Invoice not found for order: " + orderId)));
+        return toResponse(invoiceRepository
+                .findByOrder_OrderId(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found for order: " + orderId)));
     }
 
     @Override
     public List<InvoiceResponse> getAllInvoices() {
-        return invoiceRepository.findAll().stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+        return invoiceRepository.findAll().stream().map(this::toResponse).collect(Collectors.toList());
     }
 
     private InvoiceResponse toResponse(Invoice invoice) {

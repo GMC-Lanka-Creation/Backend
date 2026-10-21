@@ -19,8 +19,7 @@ import java.util.UUID;
 @Service
 public class FileStorageServiceImpl implements FileStorageService {
 
-    private static final Set<String> ALLOWED_IMAGE_EXTENSIONS =
-            Set.of("png", "jpg", "jpeg", "webp", "gif");
+    private static final Set<String> ALLOWED_IMAGE_EXTENSIONS = Set.of("png", "jpg", "jpeg", "webp", "gif");
 
     @Value("${app.upload-dir:uploads/}")
     private String uploadDir;
@@ -53,8 +52,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             Path uploadPath = Paths.get(uploadDir, folder);
             Files.createDirectories(uploadPath);
             String uniqueName = UUID.randomUUID() + "." + extension;
-            Files.copy(file.getInputStream(), uploadPath.resolve(uniqueName),
-                    StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(file.getInputStream(), uploadPath.resolve(uniqueName), StandardCopyOption.REPLACE_EXISTING);
             return "/uploads/" + folder + "/" + uniqueName;
         } catch (IOException e) {
             throw new InvalidFileException("Failed to store image: " + e.getMessage());

@@ -42,9 +42,9 @@ public class CustomDesignServiceImpl implements CustomDesignService {
 
     @Override
     @Transactional
-    public CustomDesignResponse submitDesign(Long userId, String designName, String description,
-                                              MultipartFile file) {
-        User user = userRepository.findById(userId)
+    public CustomDesignResponse submitDesign(Long userId, String designName, String description, MultipartFile file) {
+        User user = userRepository
+                .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
         String filePath = null;
         if (file != null && !file.isEmpty()) {
@@ -70,21 +70,21 @@ public class CustomDesignServiceImpl implements CustomDesignService {
 
     @Override
     public List<CustomDesignResponse> getAllDesigns() {
-        return customDesignRepository.findAll().stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+        return customDesignRepository.findAll().stream().map(this::toResponse).collect(Collectors.toList());
     }
 
     @Override
     public CustomDesignResponse getDesignById(Long designId) {
-        return toResponse(customDesignRepository.findById(designId)
+        return toResponse(customDesignRepository
+                .findById(designId)
                 .orElseThrow(() -> new ResourceNotFoundException("Design not found: " + designId)));
     }
 
     @Override
     @Transactional
     public CustomDesignResponse updateStatus(Long designId, CustomDesignStatus status) {
-        CustomDesign design = customDesignRepository.findById(designId)
+        CustomDesign design = customDesignRepository
+                .findById(designId)
                 .orElseThrow(() -> new ResourceNotFoundException("Design not found: " + designId));
         design.setStatus(status);
         return toResponse(customDesignRepository.save(design));
