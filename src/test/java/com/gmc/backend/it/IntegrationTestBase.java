@@ -8,6 +8,8 @@ import com.gmc.backend.security.CustomUserDetails;
 import com.gmc.backend.security.JwtTokenProvider;
 import com.gmc.backend.service.EmailService;
 import com.gmc.backend.service.StripeGateway;
+import java.util.Map;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -17,9 +19,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
-
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Base for API integration tests: the full Spring context, real security filter chain and
@@ -93,8 +92,8 @@ public abstract class IntegrationTestBase {
     protected String bearer(User user) {
         return "Bearer "
                 + jwtTokenProvider.generateToken(
-                        new CustomUserDetails(user),
-                        Map.of("role", user.getRole().getRoleName(), "userId", user.getUserId()));
+                new CustomUserDetails(user),
+                Map.of("role", user.getRole().getRoleName(), "userId", user.getUserId()));
     }
 
     /** Gives each request its own client IP so the per-IP rate limits never trip across tests. */
