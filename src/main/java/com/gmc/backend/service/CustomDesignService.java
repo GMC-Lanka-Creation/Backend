@@ -8,8 +8,7 @@ import java.util.List;
 
 public interface CustomDesignService {
 
-    CustomDesignResponse submitDesign(Long userId, String designName, String description,
-                                      MultipartFile file);
+    CustomDesignResponse submitDesign(Long userId, String designName, String description, MultipartFile file);
 
     List<CustomDesignResponse> getDesignsByUser(Long userId);
 
