@@ -1,6 +1,12 @@
 package com.gmc.backend.it;
 
-import com.gmc.backend.model.*;
+import com.gmc.backend.model.Complaint;
+import com.gmc.backend.model.Order;
+import com.gmc.backend.model.OrderItem;
+import com.gmc.backend.model.OrderStatus;
+import com.gmc.backend.model.Product;
+import com.gmc.backend.model.ProductCategory;
+import com.gmc.backend.model.User;
 import com.gmc.backend.repository.ComplaintRepository;
 import com.gmc.backend.repository.OrderRepository;
 import com.gmc.backend.repository.ProductCategoryRepository;

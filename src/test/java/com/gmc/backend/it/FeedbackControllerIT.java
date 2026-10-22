@@ -1,7 +1,17 @@
 package com.gmc.backend.it;
 
-import com.gmc.backend.model.*;
-import com.gmc.backend.repository.*;
+import com.gmc.backend.model.Feedback;
+import com.gmc.backend.model.Order;
+import com.gmc.backend.model.OrderItem;
+import com.gmc.backend.model.OrderStatus;
+import com.gmc.backend.model.Product;
+import com.gmc.backend.model.ProductCategory;
+import com.gmc.backend.model.User;
+import com.gmc.backend.repository.FeedbackRepository;
+import com.gmc.backend.repository.NotificationRepository;
+import com.gmc.backend.repository.OrderRepository;
+import com.gmc.backend.repository.ProductCategoryRepository;
+import com.gmc.backend.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +25,9 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
