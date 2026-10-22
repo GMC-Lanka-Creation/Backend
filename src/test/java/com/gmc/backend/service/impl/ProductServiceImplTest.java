@@ -1,28 +1,30 @@
 package com.gmc.backend.service.impl;
 
-import com.gmc.backend.dto.request.ProductRequest;
-import com.gmc.backend.dto.response.ProductResponse;
-import com.gmc.backend.exception.ResourceNotFoundException;
-import com.gmc.backend.model.Product;
-import com.gmc.backend.model.ProductCategory;
-import com.gmc.backend.repository.ProductCategoryRepository;
-import com.gmc.backend.repository.ProductRepository;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.gmc.backend.dto.request.ProductRequest;
+import com.gmc.backend.dto.response.ProductResponse;
+import com.gmc.backend.exception.ResourceNotFoundException;
+import com.gmc.backend.model.Product;
+import com.gmc.backend.model.ProductCategory;
+import com.gmc.backend.repository.CartItemRepository;
+import com.gmc.backend.repository.ProductCategoryRepository;
+import com.gmc.backend.repository.ProductRepository;
+import com.gmc.backend.service.FileStorageService;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 
 /**
  * Unit tests for {@link ProductServiceImpl}. The repositories are mocked; the
@@ -33,8 +35,15 @@ class ProductServiceImplTest {
 
     @Mock
     private ProductRepository productRepository;
+
     @Mock
     private ProductCategoryRepository categoryRepository;
+
+    @Mock
+    private FileStorageService fileStorageService;
+
+    @Mock
+    private CartItemRepository cartItemRepository;
 
     @InjectMocks
     private ProductServiceImpl productService;
@@ -80,8 +89,7 @@ class ProductServiceImplTest {
     void getProductById_notFound_throws() {
         when(productRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> productService.getProductById(99L))
-                .isInstanceOf(ResourceNotFoundException.class);
+        assertThatThrownBy(() -> productService.getProductById(99L)).isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
@@ -105,8 +113,7 @@ class ProductServiceImplTest {
 
     @Test
     void searchProducts_delegatesToRepository() {
-        when(productRepository.findByNameContainingIgnoreCase("wid"))
-                .thenReturn(List.of(product(2L, "Steel")));
+        when(productRepository.findByNameContainingIgnoreCase("wid")).thenReturn(List.of(product(2L, "Steel")));
 
         List<ProductResponse> result = productService.searchProducts("wid");
 
@@ -115,8 +122,7 @@ class ProductServiceImplTest {
 
     @Test
     void getProductsByMaterial_filtersCaseInsensitively() {
-        when(productRepository.findAll())
-                .thenReturn(List.of(product(2L, "Steel"), product(3L, "Wood")));
+        when(productRepository.findAll()).thenReturn(List.of(product(2L, "Steel"), product(3L, "Wood")));
 
         List<ProductResponse> result = productService.getProductsByMaterial("steel");
 
@@ -162,14 +168,48 @@ class ProductServiceImplTest {
     }
 
     @Test
+    void createProduct_withGallery_keepsChosenCover() {
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category()));
+        when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        ProductRequest request = new ProductRequest();
+        request.setName("New");
+        request.setPrice(new BigDecimal("120"));
+        request.setCategoryId(1L);
+        request.setImageUrls(List.of("a.jpg", "b.jpg", "c.jpg"));
+        request.setImageUrl("b.jpg");
+
+        ProductResponse result = productService.createProduct(request);
+
+        assertThat(result.getImageUrls()).containsExactly("a.jpg", "b.jpg", "c.jpg");
+        assertThat(result.getImageUrl()).isEqualTo("b.jpg");
+    }
+
+    @Test
+    void createProduct_coverNotInGallery_defaultsToFirstImage() {
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category()));
+        when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        ProductRequest request = new ProductRequest();
+        request.setName("New");
+        request.setPrice(new BigDecimal("120"));
+        request.setCategoryId(1L);
+        request.setImageUrls(List.of("a.jpg", "b.jpg"));
+        request.setImageUrl("missing.jpg");
+
+        ProductResponse result = productService.createProduct(request);
+
+        assertThat(result.getImageUrl()).isEqualTo("a.jpg");
+    }
+
+    @Test
     void createProduct_categoryNotFound_throwsAndDoesNotSave() {
         when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
 
         ProductRequest request = new ProductRequest();
         request.setCategoryId(1L);
 
-        assertThatThrownBy(() -> productService.createProduct(request))
-                .isInstanceOf(ResourceNotFoundException.class);
+        assertThatThrownBy(() -> productService.createProduct(request)).isInstanceOf(ResourceNotFoundException.class);
         verify(productRepository, never()).save(any(Product.class));
     }
 
@@ -206,20 +246,53 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void deleteProduct_existing_deletes() {
-        when(productRepository.findById(2L)).thenReturn(Optional.of(product(2L, "Steel")));
+    void deleteProduct_archivesInsteadOfDeleting() {
+        Product product = product(2L, "Steel");
+        when(productRepository.findById(2L)).thenReturn(Optional.of(product));
 
         productService.deleteProduct(2L);
 
-        verify(productRepository).deleteById(2L);
+        // Past orders and reviews still reference it, so it's archived, not removed
+        assertThat(product.getIsActive()).isFalse();
+        verify(productRepository, never()).deleteById(any());
+        verify(cartItemRepository).deleteByProduct(product);
+    }
+
+    @Test
+    void getAllProducts_hidesArchivedProducts() {
+        Product archived = product(3L, "Oak");
+        archived.setIsActive(false);
+        when(productRepository.findAll()).thenReturn(List.of(product(2L, "Steel"), archived));
+
+        assertThat(productService.getAllProducts())
+                .extracting(ProductResponse::getProductId)
+                .containsExactly(2L);
+        assertThat(productService.getAllProductsIncludingArchived()).hasSize(2);
+    }
+
+    @Test
+    void setActive_restoresArchivedProduct() {
+        Product archived = product(3L, "Oak");
+        archived.setIsActive(false);
+        when(productRepository.findById(3L)).thenReturn(Optional.of(archived));
+        when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        assertThat(productService.setActive(3L, true).isActive()).isTrue();
     }
 
     @Test
     void deleteProduct_notFound_throwsAndDoesNotDelete() {
         when(productRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> productService.deleteProduct(99L))
-                .isInstanceOf(ResourceNotFoundException.class);
+        assertThatThrownBy(() -> productService.deleteProduct(99L)).isInstanceOf(ResourceNotFoundException.class);
         verify(productRepository, never()).deleteById(99L);
+    }
+
+    @Test
+    void uploadImages_delegatesToFileStorageInProductsFolder() {
+        MockMultipartFile file = new MockMultipartFile("files", "chair.jpg", "image/jpeg", new byte[] {1});
+        when(fileStorageService.storeImages(List.of(file), "products")).thenReturn(List.of("/uploads/products/x.jpg"));
+
+        assertThat(productService.uploadImages(List.of(file))).containsExactly("/uploads/products/x.jpg");
     }
 }

@@ -1,18 +1,18 @@
 package com.gmc.backend.security;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.security.core.userdetails.UserDetails;
 
 class JwtTokenProviderTest {
 
@@ -22,8 +22,11 @@ class JwtTokenProviderTest {
     private static final String SECRET = "dGVzdFNlY3JldEtleUZvclVuaXRUZXN0aW5nUHVycG9zZXNPbmx5";
 
     @BeforeEach
-    void setUp() {
-        jwtTokenProvider = new JwtTokenProvider(SECRET);
+    void setUp() throws Exception {
+        jwtTokenProvider = new JwtTokenProvider();
+        Field secretField = JwtTokenProvider.class.getDeclaredField("secretKey");
+        secretField.setAccessible(true);
+        secretField.set(jwtTokenProvider, SECRET);
     }
 
     @Test

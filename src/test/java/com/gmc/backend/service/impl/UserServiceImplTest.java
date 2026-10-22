@@ -1,32 +1,37 @@
 package com.gmc.backend.service.impl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.gmc.backend.dto.request.ChangePasswordRequest;
 import com.gmc.backend.dto.request.CreateUserRequest;
 import com.gmc.backend.dto.request.UpdateProfileRequest;
 import com.gmc.backend.dto.response.UserResponse;
 import com.gmc.backend.exception.BusinessRuleException;
 import com.gmc.backend.exception.DuplicateEmailException;
+import com.gmc.backend.exception.InvalidFileException;
 import com.gmc.backend.exception.ResourceNotFoundException;
 import com.gmc.backend.model.Role;
 import com.gmc.backend.model.User;
+import com.gmc.backend.repository.RefreshTokenRepository;
 import com.gmc.backend.repository.RoleRepository;
 import com.gmc.backend.repository.UserRepository;
+import com.gmc.backend.service.FileStorageService;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -40,6 +45,12 @@ class UserServiceImplTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private FileStorageService fileStorageService;
+
+    @Mock
+    private RefreshTokenRepository refreshTokenRepository;
+
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -48,8 +59,15 @@ class UserServiceImplTest {
     }
 
     private User user() {
-        return User.builder().userId(1L).name("Alice").email("alice@example.com")
-                .password("encoded-pass").phone("0771234567").role(role()).active(true).build();
+        return User.builder()
+                .userId(1L)
+                .name("Alice")
+                .email("alice@example.com")
+                .password("encoded-pass")
+                .phone("0771234567")
+                .role(role())
+                .active(true)
+                .build();
     }
 
     @Test
@@ -60,6 +78,39 @@ class UserServiceImplTest {
 
         assertEquals("Alice", result.getName());
         assertEquals("alice@example.com", result.getEmail());
+    }
+
+    @Test
+    void updateProfileImage_shouldStoreInAvatarsFolderAndSaveUrl() {
+        MockMultipartFile file = new MockMultipartFile("file", "me.png", "image/png", new byte[] {1});
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user()));
+        when(fileStorageService.storeImages(List.of(file), "avatars")).thenReturn(List.of("/uploads/avatars/me.png"));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        UserResponse result = userService.updateProfileImage(1L, file);
+
+        assertEquals("/uploads/avatars/me.png", result.getProfileImageUrl());
+    }
+
+    @Test
+    void updateProfileImage_shouldThrowWhenNothingStored() {
+        MockMultipartFile empty = new MockMultipartFile("file", "me.png", "image/png", new byte[0]);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user()));
+        when(fileStorageService.storeImages(List.of(empty), "avatars")).thenReturn(List.of());
+
+        assertThrows(InvalidFileException.class, () -> userService.updateProfileImage(1L, empty));
+    }
+
+    @Test
+    void removeProfileImage_shouldClearUrl() {
+        User user = user();
+        user.setProfileImageUrl("/uploads/avatars/old.png");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        UserResponse result = userService.removeProfileImage(1L);
+
+        assertNull(result.getProfileImageUrl());
     }
 
     @Test
@@ -112,6 +163,8 @@ class UserServiceImplTest {
         userService.changePassword(1L, req);
 
         assertEquals("new-encoded", u.getPassword());
+        // Other sessions are signed out after a password change
+        verify(refreshTokenRepository).deleteAllByUser(u);
         verify(userRepository).save(u);
     }
 
@@ -127,8 +180,14 @@ class UserServiceImplTest {
     @Test
     void getUsersByRole_shouldReturnOnlyMatchingRole() {
         Role adminRole = Role.builder().roleId(2L).roleName("ADMIN").build();
-        User admin = User.builder().userId(2L).name("Admin").email("admin@test.com")
-                .password("pass").role(adminRole).active(true).build();
+        User admin = User.builder()
+                .userId(2L)
+                .name("Admin")
+                .email("admin@test.com")
+                .password("pass")
+                .role(adminRole)
+                .active(true)
+                .build();
         when(userRepository.findAll()).thenReturn(List.of(user(), admin));
 
         List<UserResponse> result = userService.getUsersByRole("CUSTOMER");
@@ -193,5 +252,34 @@ class UserServiceImplTest {
 
         assertTrue(u.getActive());
         verify(userRepository).save(u);
+    }
+
+    @Test
+    void deactivateUser_shouldRefuseTheLastActiveAdmin() {
+        User admin = User.builder()
+                .userId(5L)
+                .name("Admin")
+                .email("admin@x.com")
+                .role(Role.builder().roleId(2L).roleName("ADMIN").build())
+                .active(true)
+                .build();
+        when(userRepository.findById(5L)).thenReturn(Optional.of(admin));
+        when(userRepository.findByRole_RoleName("ADMIN")).thenReturn(List.of(admin));
+
+        assertThrows(BusinessRuleException.class, () -> userService.deactivateUser(5L));
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void createUser_shouldRejectUnknownRoleInsteadOfCreatingIt() {
+        CreateUserRequest req = new CreateUserRequest();
+        req.setName("Bob");
+        req.setEmail("Bob@Example.com ");
+        req.setPassword("password123");
+        req.setRole("ADMN");
+        when(userRepository.existsByEmail("bob@example.com")).thenReturn(false);
+
+        assertThrows(BusinessRuleException.class, () -> userService.createUser(req));
+        verify(roleRepository, never()).save(any());
     }
 }
