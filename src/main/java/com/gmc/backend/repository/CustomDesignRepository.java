@@ -15,6 +15,4 @@ public interface CustomDesignRepository extends JpaRepository<CustomDesign, Long
     List<CustomDesign> findByUser_UserId(Long userId);
 
     List<CustomDesign> findByDesignNameContainingIgnoreCase(String name);
-
 }
-

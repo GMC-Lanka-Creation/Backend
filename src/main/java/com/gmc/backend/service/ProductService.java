@@ -29,5 +29,6 @@ public interface ProductService {
 
     /** Admin view: every product, including archived ones. */
     List<ProductResponse> getAllProductsIncludingArchived();
+
     List<String> uploadImages(List<MultipartFile> files);
 }

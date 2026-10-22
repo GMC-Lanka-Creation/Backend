@@ -18,6 +18,4 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> 
     List<Maintenance> findByProduct(Product product);
 
     List<Maintenance> findByStatus(String status);
-
 }
-

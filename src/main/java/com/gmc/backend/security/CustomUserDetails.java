@@ -1,6 +1,5 @@
 package com.gmc.backend.security;
 
-
 import com.gmc.backend.model.Role;
 import com.gmc.backend.model.User;
 import org.springframework.security.core.GrantedAuthority;

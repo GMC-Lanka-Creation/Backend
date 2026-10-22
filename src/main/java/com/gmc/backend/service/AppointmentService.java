@@ -30,6 +30,5 @@ public interface AppointmentService {
     AppointmentResponse adminCancel(Long appointmentId, String note);
 
     // Generic admin status change (APPROVED, CANCELLED, COMPLETED); rules are enforced inside
-    AppointmentResponse updateStatus(Long appointmentId, AppointmentStatus status,
-                                     String meetingLink, String note);
+    AppointmentResponse updateStatus(Long appointmentId, AppointmentStatus status, String meetingLink, String note);
 }
