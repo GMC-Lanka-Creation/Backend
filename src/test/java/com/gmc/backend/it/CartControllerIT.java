@@ -1,18 +1,17 @@
 package com.gmc.backend.it;
 
-import com.gmc.backend.model.Product;
-import com.gmc.backend.model.User;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-
-import java.util.Map;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.gmc.backend.model.Product;
+import com.gmc.backend.model.User;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 
 class CartControllerIT extends ShopIntegrationTestBase {
 

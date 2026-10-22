@@ -25,9 +25,9 @@ import lombok.Setter;
 @Table(
         name = "feedbacks",
         uniqueConstraints =
-        @UniqueConstraint(
-                name = "uk_feedback_user_order_product",
-                columnNames = {"user_id", "order_id", "product_id"}))
+                @UniqueConstraint(
+                        name = "uk_feedback_user_order_product",
+                        columnNames = {"user_id", "order_id", "product_id"}))
 @Getter
 @Setter
 @NoArgsConstructor

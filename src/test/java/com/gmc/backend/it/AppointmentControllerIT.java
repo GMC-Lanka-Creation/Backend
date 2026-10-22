@@ -202,9 +202,9 @@ class AppointmentControllerIT extends IntegrationTestBase {
                 .andExpect(jsonPath("$.status").value("PENDING"));
 
         assertThat(appointmentRepository
-                .findById(appointment.getAppointmentId())
-                .orElseThrow()
-                .getDate())
+                        .findById(appointment.getAppointmentId())
+                        .orElseThrow()
+                        .getDate())
                 .isEqualTo(LocalDateTime.parse(newDate));
     }
 
@@ -257,9 +257,9 @@ class AppointmentControllerIT extends IntegrationTestBase {
                 .andExpect(jsonPath("$.status").value("CANCELLED"));
 
         assertThat(appointmentRepository
-                .findById(appointment.getAppointmentId())
-                .orElseThrow()
-                .getStatus())
+                        .findById(appointment.getAppointmentId())
+                        .orElseThrow()
+                        .getStatus())
                 .isEqualTo(AppointmentStatus.CANCELLED);
     }
 
@@ -274,9 +274,9 @@ class AppointmentControllerIT extends IntegrationTestBase {
                 .andExpect(status().isNotFound());
 
         assertThat(appointmentRepository
-                .findById(appointment.getAppointmentId())
-                .orElseThrow()
-                .getStatus())
+                        .findById(appointment.getAppointmentId())
+                        .orElseThrow()
+                        .getStatus())
                 .isEqualTo(AppointmentStatus.PENDING);
     }
 

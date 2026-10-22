@@ -92,8 +92,8 @@ public abstract class IntegrationTestBase {
     protected String bearer(User user) {
         return "Bearer "
                 + jwtTokenProvider.generateToken(
-                new CustomUserDetails(user),
-                Map.of("role", user.getRole().getRoleName(), "userId", user.getUserId()));
+                        new CustomUserDetails(user),
+                        Map.of("role", user.getRole().getRoleName(), "userId", user.getUserId()));
     }
 
     /** Gives each request its own client IP so the per-IP rate limits never trip across tests. */

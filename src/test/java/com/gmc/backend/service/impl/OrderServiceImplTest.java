@@ -340,7 +340,7 @@ class OrderServiceImplTest {
         when(orderRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(order));
         when(stripeGateway.publishableKey()).thenReturn("pk_test_123");
         when(stripeGateway.createPaymentIntent(
-                eq(10L), eq(143000L), eq("alice@example.com"), eq("gmc-order-10-initial")))
+                        eq(10L), eq(143000L), eq("alice@example.com"), eq("gmc-order-10-initial")))
                 .thenReturn(intent("requires_payment_method", 143000L));
 
         PaymentSessionResponse session = orderService.startPayment(10L, 1L);
@@ -467,7 +467,7 @@ class OrderServiceImplTest {
         Product product = product(8);
         Order order = unpaidCardOrder(user(), product);
         when(orderRepository.findByPaymentMethodAndStatusAndOrderDateBefore(
-                eq(PaymentMethod.CARD), eq(OrderStatus.PENDING), any()))
+                        eq(PaymentMethod.CARD), eq(OrderStatus.PENDING), any()))
                 .thenReturn(List.of(order));
         when(orderRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(order));
         when(stripeGateway.retrievePaymentIntent("pi_1")).thenReturn(intent("requires_payment_method", 143000L));
@@ -486,7 +486,7 @@ class OrderServiceImplTest {
         Product product = product(8);
         Order order = unpaidCardOrder(user(), product);
         when(orderRepository.findByPaymentMethodAndStatusAndOrderDateBefore(
-                eq(PaymentMethod.CARD), eq(OrderStatus.PENDING), any()))
+                        eq(PaymentMethod.CARD), eq(OrderStatus.PENDING), any()))
                 .thenReturn(List.of(order));
         when(orderRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(order));
         when(stripeGateway.retrievePaymentIntent("pi_1")).thenReturn(intent("succeeded", 143000L));

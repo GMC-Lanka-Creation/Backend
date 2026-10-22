@@ -4,7 +4,6 @@ import com.gmc.backend.dto.request.AppointmentRequest;
 import com.gmc.backend.dto.request.RescheduleRequest;
 import com.gmc.backend.dto.response.AppointmentResponse;
 import com.gmc.backend.model.AppointmentStatus;
-
 import java.util.List;
 
 public interface AppointmentService {

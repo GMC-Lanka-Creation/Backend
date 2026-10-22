@@ -9,11 +9,10 @@ import com.gmc.backend.repository.AppointmentRepository;
 import com.gmc.backend.repository.ProductCategoryRepository;
 import com.gmc.backend.repository.ProductRepository;
 import com.gmc.backend.service.CategoryService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor

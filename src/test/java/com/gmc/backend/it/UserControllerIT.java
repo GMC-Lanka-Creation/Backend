@@ -215,8 +215,8 @@ class UserControllerIT extends IntegrationTestBase {
                 .andExpect(status().isUnprocessableEntity());
 
         assertThat(passwordEncoder.matches(
-                PASSWORD,
-                userRepository.findById(user.getUserId()).orElseThrow().getPassword()))
+                        PASSWORD,
+                        userRepository.findById(user.getUserId()).orElseThrow().getPassword()))
                 .isTrue();
     }
 

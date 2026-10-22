@@ -1,5 +1,11 @@
 package com.gmc.backend.service.impl;
 
+import static com.gmc.backend.model.AppointmentStatus.APPROVED;
+import static com.gmc.backend.model.AppointmentStatus.CANCELLED;
+import static com.gmc.backend.model.AppointmentStatus.COMPLETED;
+import static com.gmc.backend.model.AppointmentStatus.PENDING;
+import static com.gmc.backend.model.AppointmentStatus.RESCHEDULED;
+
 import com.gmc.backend.dto.request.AppointmentRequest;
 import com.gmc.backend.dto.request.RescheduleRequest;
 import com.gmc.backend.dto.response.AppointmentResponse;
@@ -15,10 +21,6 @@ import com.gmc.backend.repository.UserRepository;
 import com.gmc.backend.service.AppointmentService;
 import com.gmc.backend.service.EmailService;
 import com.gmc.backend.service.NotificationService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
@@ -27,12 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-
-import static com.gmc.backend.model.AppointmentStatus.APPROVED;
-import static com.gmc.backend.model.AppointmentStatus.CANCELLED;
-import static com.gmc.backend.model.AppointmentStatus.COMPLETED;
-import static com.gmc.backend.model.AppointmentStatus.PENDING;
-import static com.gmc.backend.model.AppointmentStatus.RESCHEDULED;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

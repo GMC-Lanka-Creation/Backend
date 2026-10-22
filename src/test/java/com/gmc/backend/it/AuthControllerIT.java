@@ -232,4 +232,3 @@ class AuthControllerIT extends IntegrationTestBase {
                 .andExpect(status().isForbidden());
     }
 }
-

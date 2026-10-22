@@ -1,10 +1,9 @@
 package com.gmc.backend.service;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * The single place where order totals are calculated. The checkout page displays these
@@ -40,6 +39,5 @@ public class CheckoutPricing {
         return taxRate.movePointRight(2).stripTrailingZeros();
     }
 
-    public record PriceBreakdown(BigDecimal subtotal, BigDecimal shippingFee, BigDecimal taxAmount, BigDecimal total) {
-    }
+    public record PriceBreakdown(BigDecimal subtotal, BigDecimal shippingFee, BigDecimal taxAmount, BigDecimal total) {}
 }

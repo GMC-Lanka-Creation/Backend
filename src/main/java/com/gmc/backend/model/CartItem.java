@@ -18,9 +18,9 @@ import lombok.ToString;
 @Table(
         name = "cart_items",
         uniqueConstraints =
-        @UniqueConstraint(
-                name = "uk_cart_item_product",
-                columnNames = {"cart_id", "product_id"}))
+                @UniqueConstraint(
+                        name = "uk_cart_item_product",
+                        columnNames = {"cart_id", "product_id"}))
 public class CartItem {
 
     @Id

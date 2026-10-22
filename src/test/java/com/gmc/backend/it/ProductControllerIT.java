@@ -471,9 +471,9 @@ class ProductControllerIT extends IntegrationTestBase {
                 .andExpect(status().isForbidden());
 
         assertThat(productRepository
-                .findById(teakTable.getProductId())
-                .orElseThrow()
-                .getIsActive())
+                        .findById(teakTable.getProductId())
+                        .orElseThrow()
+                        .getIsActive())
                 .isTrue();
     }
 }
