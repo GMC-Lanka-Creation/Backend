@@ -30,7 +30,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     // Scoped to the owner so one user can't mark another user's notifications
     @Modifying
-    @Query("UPDATE Notification n SET n.isRead = true "
-            + "WHERE n.notificationId = :id AND n.user.userId = :userId")
+    @Query("UPDATE Notification n SET n.isRead = true " + "WHERE n.notificationId = :id AND n.user.userId = :userId")
     int markReadByIdAndUser(@Param("id") Long id, @Param("userId") Long userId);
 }
