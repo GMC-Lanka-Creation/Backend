@@ -1,10 +1,5 @@
 package com.gmc.backend.service.impl;
 
-import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.beans.factory.annotation.Autowired;
-import java.util.function.Supplier;
-import java.util.Map;
 import com.gmc.backend.dto.request.PlaceOrderRequest;
 import com.gmc.backend.dto.response.CheckoutSummaryResponse;
 import com.gmc.backend.dto.response.OrderItemResponse;
@@ -50,8 +45,10 @@ import java.time.LocalDateTime;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Slf4j
