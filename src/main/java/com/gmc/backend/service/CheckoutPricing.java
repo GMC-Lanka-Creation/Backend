@@ -40,5 +40,6 @@ public class CheckoutPricing {
         return taxRate.movePointRight(2).stripTrailingZeros();
     }
 
-    public record PriceBreakdown(BigDecimal subtotal, BigDecimal shippingFee, BigDecimal taxAmount, BigDecimal total) {}
+    public record PriceBreakdown(BigDecimal subtotal, BigDecimal shippingFee, BigDecimal taxAmount, BigDecimal total) {
+    }
 }
