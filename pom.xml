@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>com.gmc</groupId>
 	<artifactId>backend</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.1.1-SNAPSHOT</version>
 	<name>GMC Lanka Backend</name>
 	<description>GMC Lanka Creations – CNC e-commerce backend</description>
 	<properties>
