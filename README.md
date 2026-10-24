@@ -1,15 +1,15 @@
 # GMC Lanka – Backend
 
-[![CI/CD Pipeline](https://github.com/test-gmc-lanka/backend/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/test-gmc-lanka/backend/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/test-gmc-lanka/backend/branch/develop/graph/badge.svg)](https://codecov.io/gh/test-gmc-lanka/backend)
+[![CI/CD Pipeline](https://github.com/gmc-lanka/backend/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/gmc-lanka/backend/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/gmc-lanka/backend/branch/develop/graph/badge.svg)](https://codecov.io/gh/gmc-lanka/backend)
 
 REST API for the GMC Lanka system: products and categories, cart and checkout with Stripe card payments,
 orders and invoices, appointments, custom designs, maintenance tasks for technicians, feedback,
 complaints, notifications and the admin dashboard. Part of the
-[test-gmc-lanka](https://github.com/test-gmc-lanka) project; the web client is in the
-[frontend](https://github.com/test-gmc-lanka/frontend) repository, the integration tests in
-[tests](https://github.com/test-gmc-lanka/tests) and the Dockerfile and CI/CD pipeline in
-[infra](https://github.com/test-gmc-lanka/infra).
+[gmc-lanka](https://github.com/gmc-lanka) project; the web client is in the
+[frontend](https://github.com/gmc-lanka/frontend) repository, the integration tests in
+[tests](https://github.com/gmc-lanka/tests) and the Dockerfile and CI/CD pipeline in
+[infra](https://github.com/gmc-lanka/infra).
 
 **Staging API:** _add the staging URL here once deployed_ · **API docs:** `<base-url>/swagger-ui.html`
 
@@ -22,17 +22,17 @@ Stripe · springdoc-openapi · JUnit 5 + Mockito + MockMvc · JaCoCo · Checksty
 
 - JDK 21 (no Maven install needed: use the included `./mvnw` wrapper)
 - MySQL 8 with an empty database, e.g. `CREATE DATABASE gmc_db;`
-- Docker (only to build or run the container image; see [infra](https://github.com/test-gmc-lanka/infra))
+- Docker (only to build or run the container image; see [infra](https://github.com/gmc-lanka/infra))
 
 ## Getting started
 
 ```bash
-git clone https://github.com/test-gmc-lanka/backend.git
+git clone https://github.com/gmc-lanka/backend.git
 cd backend
 git checkout develop
 ```
 
-For `./mvnw verify`, also clone [tests](https://github.com/test-gmc-lanka/tests) next to this repository
+For `./mvnw verify`, also clone [tests](https://github.com/gmc-lanka/tests) next to this repository
 (`<workspace>/backend` and `<workspace>/tests`); that is where the `*IT.java` suites live.
 
 Configure the app. Every setting has a safe default in `src/main/resources/application.properties`;
@@ -75,7 +75,7 @@ Without Stripe keys, checkout offers cash on delivery only.
 ## Testing
 
 - **Unit tests** (`*Test.java`) test one class with Mockito mocks.
-- **Integration tests** (`*IT.java`) live in the [tests](https://github.com/test-gmc-lanka/tests)
+- **Integration tests** (`*IT.java`) live in the [tests](https://github.com/gmc-lanka/tests)
   repository under `backend/src/test/java/com/gmc/backend/it/`. `pom.xml` adds that folder as a test
   source root (property `integration-tests.dir`, default `../tests/backend/src/test/java`). They call
   every REST endpoint through MockMvc with the real security filter chain and database: H2 locally,
@@ -85,7 +85,7 @@ Without Stripe keys, checkout offers cash on delivery only.
 
 ## Running with Docker
 
-The Dockerfile is in the [infra](https://github.com/test-gmc-lanka/infra) repository. With `infra`
+The Dockerfile is in the [infra](https://github.com/gmc-lanka/infra) repository. With `infra`
 cloned next to this repository:
 
 ```bash
@@ -100,7 +100,7 @@ frontend), use `docker compose up --build` in `infra`.
 ## CI/CD
 
 [.github/workflows/ci.yml](.github/workflows/ci.yml) sets the triggers and calls the pipeline defined in
-[infra/.github/workflows/backend-ci.yml](https://github.com/test-gmc-lanka/infra/blob/main/.github/workflows/backend-ci.yml),
+[infra/.github/workflows/backend-ci.yml](https://github.com/gmc-lanka/infra/blob/main/.github/workflows/backend-ci.yml),
 which runs:
 
 | Stage               | Trigger                                      |
@@ -113,10 +113,10 @@ which runs:
 | Deploy – Staging    | Merge to `develop`                           |
 | Deploy – Production | Merge to `main`, after manual approval       |
 
-Deploys build a Docker image, push it to `ghcr.io/test-gmc-lanka/backend` and call the hosting
-provider's deploy hook. A production deploy also creates the `vX.Y.Z` release tag from `pom.xml`.
+Deploys build a Docker image, push it to `ghcr.io/gmc-lanka/backend` and restart the
+container on the EC2 server over SSH (see infra's README, *Production on EC2*). A production deploy also creates the `vX.Y.Z` release tag from `pom.xml`.
 Accepted scanner findings, each with a reason and an expiry date, are listed in
-[infra/security/backend.trivyignore.yaml](https://github.com/test-gmc-lanka/infra/blob/main/security/backend.trivyignore.yaml).
+[infra/security/backend.trivyignore.yaml](https://github.com/gmc-lanka/infra/blob/main/security/backend.trivyignore.yaml).
 
 ## Branching and commits
 
