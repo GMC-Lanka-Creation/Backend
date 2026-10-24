@@ -2,7 +2,7 @@
 #
 # The stages (lint, build, unit tests, integration tests, security scan, staging and production
 # deploys) are defined once in the infra repository:
-#   https://github.com/test-gmc-lanka/infra/blob/main/.github/workflows/backend-ci.yml
+#   https://github.com/gmc-lanka/infra/blob/main/.github/workflows/backend-ci.yml
 # This file only decides when the pipeline runs and what it is allowed to do.
 name: CI/CD Pipeline
 
@@ -23,7 +23,7 @@ permissions:
 jobs:
   pipeline:
     name: Pipeline
-    uses: test-gmc-lanka/infra/.github/workflows/backend-ci.yml@main
+    uses: gmc-lanka/infra/.github/workflows/backend-ci.yml@main
     # Upper bound for the called jobs: deploys push images (packages) and create release tags (contents)
     permissions:
       contents: write
